@@ -1,0 +1,58 @@
+set -e
+set -x
+
+target_dir=$(pwd)/gen
+
+# --------------------------------------
+# Copy xmake & rust into target_dir
+# --------------------------------------
+wget -P $target_dir https://static.rust-lang.org/dist/rust-1.86.0-x86_64-unknown-linux-gnu.tar.xz
+wget -P $target_dir https://github.com/xmake-io/xmake/releases/download/v2.9.9/xmake-v2.9.9.gz.run
+
+# Install rust
+# tar -zxvf rust-1.86.0-x86_64-unknown-linux-gnu.tar.xz
+# cd rust-1.86.0-x86_64-unknown-linux-gnu/rust-1.86.0-x86_64-unknown-linux-gnu
+# bash install.sh --prefix=$(pwd)/install
+
+# Install xmake
+# chmod +x xmake-v2.9.9.gz.run
+# ./xmake-v2.9.9.gz.run
+
+mkdir -p $target_dir
+mkdir -p $target_dir/extern
+
+cp -r $VERILUA_HOME/libverilua $target_dir
+cp -r $VERILUA_HOME/luajit-pro $target_dir
+cp -r $VERILUA_HOME/wave_vpi $target_dir
+cp -r $VERILUA_HOME/src $target_dir
+cp -r $VERILUA_HOME/tools $target_dir
+cp -r $VERILUA_HOME/examples $target_dir
+cp -r $VERILUA_HOME/scripts $target_dir
+cp -r $VERILUA_HOME/Cargo.toml $target_dir
+cp -r $VERILUA_HOME/xmake.lua $target_dir
+cp -r $VERILUA_HOME/extern/debugger.lua $target_dir/extern/
+cp -r $VERILUA_HOME/extern/luafun $target_dir/extern/
+cp -r $VERILUA_HOME/extern/luajit_tcc $target_dir/extern
+cp -r $VERILUA_HOME/activate_verilua.sh $target_dir
+
+sed -i '/^git submodule update --init --recursive/ s/^/# /' $target_dir/luajit-pro/init.sh
+
+find $target_dir/examples -type d -name "build" | xargs rm -rf
+find $target_dir/examples -type d -name "sim_build*" | xargs rm -rf
+find $target_dir/examples -type d -name ".xmake" | xargs rm -rf
+find $target_dir/examples -type d -name ".dpi_exporter" | xargs rm -rf
+
+# Remove target dir
+rm -rf $target_dir/libverilua/target
+rm -rf $target_dir/luajit-pro/target
+rm -rf $target_dir/wave_vpi/target
+
+cp ./scripts/offline_build.sh $target_dir
+cp ./scripts/test_install.sh $target_dir
+cp ./scripts/verilua.sh $target_dir
+
+cd $target_dir/libverilua && CARGO_HOME=$target_dir/libverilua/.cargo cargo fetch
+cd $target_dir/luajit-pro && CARGO_HOME=$target_dir/luajit-pro/.cargo cargo fetch
+cd $target_dir/wave_vpi && CARGO_HOME=$target_dir/wave_vpi/.cargo cargo fetch
+
+tar -zcvf verilua_offline.tar.gz ./gen
