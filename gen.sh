@@ -1,6 +1,7 @@
 set -e
 set -x
 
+curr_dir=$(pwd)
 target_dir=$(pwd)/gen
 
 # --------------------------------------
@@ -55,4 +56,5 @@ cd $target_dir/libverilua && CARGO_HOME=$target_dir/libverilua/.cargo cargo fetc
 cd $target_dir/luajit-pro && CARGO_HOME=$target_dir/luajit-pro/.cargo cargo fetch
 cd $target_dir/wave_vpi && CARGO_HOME=$target_dir/wave_vpi/.cargo cargo fetch
 
+cd $curr_dir
 tar -zcvf verilua_offline.tar.gz ./gen
