@@ -1,7 +1,8 @@
-set -e
+# set -e
 set -x
 
 curr_dir=$(pwd)
+scripts_dir=$(pwd)/scripts
 target_dir=$(pwd)/gen
 
 # --------------------------------------
@@ -9,15 +10,8 @@ target_dir=$(pwd)/gen
 # --------------------------------------
 wget -P $target_dir https://static.rust-lang.org/dist/rust-1.86.0-x86_64-unknown-linux-gnu.tar.xz
 wget -P $target_dir https://github.com/xmake-io/xmake/releases/download/v2.9.9/xmake-v2.9.9.gz.run
-
-# Install rust
-# tar -zxvf rust-1.86.0-x86_64-unknown-linux-gnu.tar.xz
-# cd rust-1.86.0-x86_64-unknown-linux-gnu/rust-1.86.0-x86_64-unknown-linux-gnu
-# bash install.sh --prefix=$(pwd)/install
-
-# Install xmake
-# chmod +x xmake-v2.9.9.gz.run
-# ./xmake-v2.9.9.gz.run
+cp $scripts_dir/install_xmake.sh $target_dir
+cp $scripts_dir/install_rust.sh $target_dir
 
 mkdir -p $target_dir
 mkdir -p $target_dir/extern
@@ -48,9 +42,9 @@ rm -rf $target_dir/libverilua/target
 rm -rf $target_dir/luajit-pro/target
 rm -rf $target_dir/wave_vpi/target
 
-cp ./scripts/offline_build.sh $target_dir
-cp ./scripts/test_install.sh $target_dir
-cp ./scripts/verilua.sh $target_dir
+cp $scripts_dir/offline_build.sh $target_dir
+cp $scripts_dir/test_install.sh $target_dir
+cp $scripts_dir/verilua.sh $target_dir
 
 cd $target_dir/libverilua && CARGO_HOME=$target_dir/libverilua/.cargo cargo fetch
 cd $target_dir/luajit-pro && CARGO_HOME=$target_dir/luajit-pro/.cargo cargo fetch
