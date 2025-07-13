@@ -9,7 +9,8 @@ target_dir=$(pwd)/gen
 # Copy xmake & rust into target_dir
 # --------------------------------------
 wget -P $target_dir https://static.rust-lang.org/dist/rust-1.86.0-x86_64-unknown-linux-gnu.tar.xz
-wget -P $target_dir https://github.com/xmake-io/xmake/releases/download/v2.9.9/xmake-v2.9.9.gz.run
+wget -P $target_dir https://github.com/xmake-io/xmake/releases/download/v3.0.0/xmake-v3.0.0.gz.run
+chmod 777 $target_dir/xmake-v3.0.0.gz.run
 cp $scripts_dir/install_xmake.sh $target_dir
 cp $scripts_dir/install_rust.sh $target_dir
 
