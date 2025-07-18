@@ -16,6 +16,10 @@ jobs:
       matrix:
         os: [ 'ubuntu-22.04', 'ubuntu-24.04' ]
 
+    env:
+      IVERILOG_TAG: 's20250103'
+      RELEASE_TAG: ${{ github.ref_name }}
+
     steps:
       - name: Install dependencies
         run: |
@@ -31,6 +35,17 @@ jobs:
             profile: minimal
             toolchain: stable
             override: true
+
+      - name: Setup iverilog
+        run: |
+          sudo apt-get install -y --no-install-recommends g++ gperf flex bison make autoconf
+          git clone https://github.com/steveicarus/iverilog.git
+          cd iverilog
+          git reset --hard ${{ env.IVERILOG_TAG }}
+          bash ./autoconf.sh
+          bash ./configure
+          make -j $(nproc)
+          sudo make install
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -49,20 +64,25 @@ jobs:
 
           mkdir -p ./release/extern
           mkdir -p ./release/extern/luajit_tcc/tinycc
+          mkdir -p ./release/conan_installed/include
           mkdir -p ./release/luajit-pro/luajit2.1
           mkdir -p ./release/luajit-pro/tl
 
-          cp -r ./activate_verilua.sh ./release
           cp -r ./xmake.lua ./release
+          cp -r ./verilua.sh ./release
+          cp -r ./activate_verilua.sh ./release
+          cp -r ./conan_installed/include/argparse ./release/conan_installed/include
 
           cp -r ./src ./release
           cp -r ./shared ./release
           cp -r ./tools ./release
           cp -r ./scripts ./release
+          cp -r ./tests ./release
           cp -r ./examples ./release
           cp -r ./extern/luafun ./release/extern
           cp -r ./extern/debugger.lua ./release/extern
           cp -r ./extern/luajit_tcc/tcc.lua ./release/extern/luajit_tcc
+          cp -r ./extern/luajit_tcc/setvars.sh ./release/extern/luajit_tcc
           cp -r ./extern/luajit_tcc/tinycc/install ./release/extern/luajit_tcc/tinycc
 
           cp -r ./luajit-pro/src ./release/luajit-pro
@@ -70,6 +90,7 @@ jobs:
           cp -r ./luajit-pro/luajit2.1/lib ./release/luajit-pro/luajit2.1/lib
           cp -r ./luajit-pro/luajit2.1/etc ./release/luajit-pro/luajit2.1/etc
           cp -r ./luajit-pro/luajit2.1/share ./release/luajit-pro/luajit2.1/share
+          cp -r ./luajit-pro/luajit2.1/include ./release/luajit-pro/luajit2.1/include
           cp -r ./luajit-pro/tl/tl.lua ./release/luajit-pro/tl
           cp -r ./luajit-pro/tl/tl.tl ./release/luajit-pro/tl
 
@@ -83,7 +104,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          name: "verilua-for-${{ matrix.os }}"
+          name: "verilua-${{ env.RELEASE_TAG }}"
           files: "*.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
