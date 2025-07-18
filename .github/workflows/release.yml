@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        os: [ 'ubuntu-22.04', 'ubuntu-24.04' ]
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libboost-all-dev
+
+      - name: Setup xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+
+      - name: Setup rust
+        uses: actions-rs/toolchain@v1
+        with:
+            profile: minimal
+            toolchain: stable
+            override: true
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+
+      - name: Install verilua
+        working-directory: ./verilua
+        run: |
+          xmake install verilua
+
+      - name: Package
+        run: |
+          ORG_DIR=$(pwd)
+          cd ./verilua
+
+          mkdir -p ./release/extern
+          mkdir -p ./release/extern/luajit_tcc/tinycc
+          mkdir -p ./release/luajit-pro/luajit2.1
+          mkdir -p ./release/luajit-pro/tl
+
+          cp -r ./activate_verilua.sh ./release
+          cp -r ./xmake.lua ./release
+
+          cp -r ./src ./release
+          cp -r ./shared ./release
+          cp -r ./tools ./release
+          cp -r ./scripts ./release
+          cp -r ./examples ./release
+          cp -r ./extern/luafun ./release/extern
+          cp -r ./extern/debugger.lua ./release/extern
+          cp -r ./extern/luajit_tcc/tcc.lua ./release/extern/luajit_tcc
+          cp -r ./extern/luajit_tcc/tinycc/install ./release/extern/luajit_tcc/tinycc
+
+          cp -r ./luajit-pro/src ./release/luajit-pro
+          cp -r ./luajit-pro/luajit2.1/bin ./release/luajit-pro/luajit2.1/bin
+          cp -r ./luajit-pro/luajit2.1/lib ./release/luajit-pro/luajit2.1/lib
+          cp -r ./luajit-pro/luajit2.1/etc ./release/luajit-pro/luajit2.1/etc
+          cp -r ./luajit-pro/luajit2.1/share ./release/luajit-pro/luajit2.1/share
+          cp -r ./luajit-pro/tl/tl.lua ./release/luajit-pro/tl
+          cp -r ./luajit-pro/tl/tl.tl ./release/luajit-pro/tl
+
+          pushd release
+          zip -r ../verilua-${{ matrix.os }}.zip .
+          popd
+
+      - name: Move artifact
+        run: mv ./verilua/verilua-${{ matrix.os }}.zip .
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "verilua-for-${{ matrix.os }}"
+          files: "*.zip"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
