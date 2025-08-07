@@ -30,6 +30,7 @@ cp -r $VERILUA_HOME/extern/debugger.lua $target_dir/extern/
 cp -r $VERILUA_HOME/extern/luafun $target_dir/extern/
 cp -r $VERILUA_HOME/extern/luajit_tcc $target_dir/extern
 cp -r $VERILUA_HOME/activate_verilua.sh $target_dir
+cp -r $VERILUA_HOME/verilua.sh $target_dir
 
 sed -i '/^git submodule update --init --recursive/ s/^/# /' $target_dir/luajit-pro/init.sh
 
@@ -44,8 +45,6 @@ rm -rf $target_dir/luajit-pro/target
 rm -rf $target_dir/wave_vpi/target
 
 cp $scripts_dir/offline_build.sh $target_dir
-cp $scripts_dir/test_install.sh $target_dir
-cp $scripts_dir/verilua.sh $target_dir
 
 cd $target_dir/libverilua && CARGO_HOME=$target_dir/libverilua/.cargo cargo fetch
 cd $target_dir/luajit-pro && CARGO_HOME=$target_dir/luajit-pro/.cargo cargo fetch
