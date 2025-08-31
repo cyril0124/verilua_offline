@@ -30,8 +30,4 @@ export LUA_LINK=shared
 # If you are using CentOS 7, you may need to use `scl enable devtoolset-11 bash` to ensure the use of a newer version of gcc.
 cd $prj_dir
 export CARGO_HOME=$prj_dir/libverilua/.cargo
-xmake b libverilua_vcs
-xmake b libverilua_vcs_dpi
-xmake b libverilua_verilator
-xmake b libverilua_verilator_dpi
-xmake b libverilua_wave_vpi
+xmake r build_libverilua
