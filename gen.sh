@@ -19,7 +19,6 @@ mkdir -p $target_dir/extern
 
 cp -r $VERILUA_HOME/libverilua $target_dir
 cp -r $VERILUA_HOME/luajit-pro $target_dir
-cp -r $VERILUA_HOME/wave_vpi $target_dir
 cp -r $VERILUA_HOME/src $target_dir
 cp -r $VERILUA_HOME/tools $target_dir
 cp -r $VERILUA_HOME/examples $target_dir
@@ -29,6 +28,7 @@ cp -r $VERILUA_HOME/xmake.lua $target_dir
 cp -r $VERILUA_HOME/extern/debugger.lua $target_dir/extern/
 cp -r $VERILUA_HOME/extern/luafun $target_dir/extern/
 cp -r $VERILUA_HOME/extern/luajit_tcc $target_dir/extern
+cp -r $VERILUA_HOME/extern/boost_unordered $target_dir/extern
 cp -r $VERILUA_HOME/activate_verilua.sh $target_dir
 cp -r $VERILUA_HOME/verilua.sh $target_dir
 cp -r $VERILUA_HOME/VERSION $target_dir
@@ -41,16 +41,14 @@ find $target_dir/examples -type d -name ".xmake" | xargs rm -rf
 find $target_dir/examples -type d -name ".dpi_exporter" | xargs rm -rf
 
 # Remove target dir
-rm -rf $target_dir/libverilua/target
 rm -rf $target_dir/luajit-pro/target
-rm -rf $target_dir/wave_vpi/target
 
 cp $scripts_dir/offline_build.sh $target_dir
 cp $scripts_dir/build_wave_vpi.sh $target_dir
 
 cd $target_dir/libverilua && CARGO_HOME=$target_dir/libverilua/.cargo cargo fetch
 cd $target_dir/luajit-pro && CARGO_HOME=$target_dir/luajit-pro/.cargo cargo fetch
-cd $target_dir/wave_vpi && CARGO_HOME=$target_dir/wave_vpi/.cargo cargo fetch
+cd $target_dir/src/wave_vpi/wellen_impl && CARGO_HOME=$target_dir/src/wave_vpi/wellen_impl/.cargo cargo fetch
 
 cd $curr_dir
 tar -zcvf verilua_offline.tar.gz ./gen

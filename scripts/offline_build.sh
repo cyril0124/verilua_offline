@@ -11,13 +11,6 @@ prj_dir=$(pwd)
 cd $prj_dir/luajit-pro && CARGO_HOME=$prj_dir/luajit-pro/.cargo cargo build --release
 bash init.sh
 
-
-# --------------------------------------
-# Build wave_vpi
-# --------------------------------------
-cd $prj_dir/wave_vpi && CARGO_HOME=$prj_dir/wave_vpi/.cargo cargo build --release
-
-
 # --------------------------------------
 # Build libverilua
 # --------------------------------------
